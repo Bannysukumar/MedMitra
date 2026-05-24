@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Search, Filter, ShoppingCart } from 'lucide-react'
-import { medicines } from '../../data/mockData'
+import { useMedicines } from '../../hooks/useFirestore'
 import { MEDICINE_CATEGORIES } from '../../config/constants'
 import { useCartStore } from '../../stores/useStore'
 import { searchMedicines } from '../../services/searchService'
@@ -10,6 +10,7 @@ import { formatCurrency, cn } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 
 export default function DashboardMedicines() {
+  const { data: medicines } = useMedicines()
   const [category, setCategory] = useState('All')
   const [query, setQuery] = useState('')
   const addToCart = useCartStore((s) => s.addItem)
@@ -17,7 +18,7 @@ export default function DashboardMedicines() {
   const filtered = (() => {
     let list = medicines
     if (category !== 'All') list = list.filter((m) => m.category === category)
-    if (query.trim()) list = searchMedicines(query).filter((m) => category === 'All' || m.category === category)
+    if (query.trim()) list = searchMedicines(query, medicines).filter((m) => category === 'All' || m.category === category)
     return list
   })()
 

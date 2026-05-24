@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, User, ArrowRight, Clock } from 'lucide-react'
-import { blogPosts } from '../../data/mockData'
+import { useBlogPosts } from '../../hooks/useFirestore'
 import PageHero from '../../components/marketing/PageHero'
 import SectionHeader from '../../components/marketing/SectionHeader'
 import CTASection from '../../components/marketing/CTASection'
@@ -10,6 +10,7 @@ import { formatDate, cn } from '../../utils/helpers'
 const ALL_CATEGORIES = 'All'
 
 export default function Blog() {
+  const { data: blogPosts, loading } = useBlogPosts()
   const [activeCategory, setActiveCategory] = useState(ALL_CATEGORIES)
   const categories = [ALL_CATEGORIES, ...new Set(blogPosts.map((p) => p.category))]
 
@@ -50,7 +51,13 @@ export default function Blog() {
         </div>
       </section>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <section className="py-20">
+          <div className="mx-auto max-w-lg px-4 text-center">
+            <p className="font-medium text-gray-700">Loading blog posts...</p>
+          </div>
+        </section>
+      ) : filtered.length === 0 ? (
         <section className="py-20">
           <div className="mx-auto max-w-lg px-4 text-center">
             <p className="font-medium text-gray-700">No posts in this category yet. Check back soon.</p>

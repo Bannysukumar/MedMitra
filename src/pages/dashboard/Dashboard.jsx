@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { useAuth } from '../../contexts/AuthContext'
-import { demoOrders } from '../../data/mockData'
+import { useUserOrders } from '../../hooks/useFirestore'
 import DashboardCard, { OrderThumbnail } from '../../components/dashboard/DashboardCard'
 import StatusPill from '../../components/ui/StatusPill'
 import Button from '../../components/ui/Button'
@@ -24,33 +24,35 @@ const CHART_COLORS = {
   returned: '#94a3b8',
 }
 
-const chartData = [
-  { name: 'Delivered', value: demoOrders.filter((o) => o.status === 'delivered').length, key: 'delivered' },
-  { name: 'Pending', value: demoOrders.filter((o) => o.status === 'pending').length, key: 'pending' },
-  { name: 'Processing', value: demoOrders.filter((o) => o.status === 'processing').length, key: 'processing' },
-  { name: 'Cancelled', value: demoOrders.filter((o) => o.status === 'cancelled').length, key: 'cancelled' },
-].filter((d) => d.value > 0)
-
 export default function Dashboard() {
-  const { displayName } = useAuth()
+  const { displayName, user } = useAuth()
+  const { data: orders, loading } = useUserOrders(user?.uid)
   const firstName = displayName.split(' ')[0]
-  const totalSavings = demoOrders.reduce((s, o) => s + (o.savings || 0), 0)
-  const pendingCount = demoOrders.filter((o) => o.status === 'pending' || o.status === 'processing').length
-  const deliveredCount = demoOrders.filter((o) => o.status === 'delivered').length
+
+  const chartData = [
+    { name: 'Delivered', value: orders.filter((o) => o.status === 'delivered').length, key: 'delivered' },
+    { name: 'Pending', value: orders.filter((o) => o.status === 'pending').length, key: 'pending' },
+    { name: 'Processing', value: orders.filter((o) => o.status === 'processing').length, key: 'processing' },
+    { name: 'Cancelled', value: orders.filter((o) => o.status === 'cancelled').length, key: 'cancelled' },
+  ].filter((d) => d.value > 0)
+
+  const totalSavings = orders.reduce((s, o) => s + (o.savings || 0), 0)
+  const pendingCount = orders.filter((o) => o.status === 'pending' || o.status === 'processing').length
+  const deliveredCount = orders.filter((o) => o.status === 'delivered').length
 
   const stats = [
     {
       label: 'Total Orders',
-      value: '12',
-      sub: '+2 this month',
-      subColor: 'text-green-600',
+      value: loading ? '...' : String(orders.length),
+      sub: orders.length ? 'All time' : 'No orders yet',
+      subColor: 'text-gray-500',
       icon: Package,
       iconBg: 'bg-blue-50',
       iconColor: 'text-primary-600',
     },
     {
       label: 'Pending Orders',
-      value: String(pendingCount),
+      value: loading ? '...' : String(pendingCount),
       sub: 'View orders',
       subLink: '/dashboard/orders',
       icon: Clock,
@@ -59,7 +61,7 @@ export default function Dashboard() {
     },
     {
       label: 'Delivered Orders',
-      value: String(deliveredCount),
+      value: loading ? '...' : String(deliveredCount),
       sub: 'View orders',
       subLink: '/dashboard/orders',
       icon: CheckCircle,
@@ -68,8 +70,8 @@ export default function Dashboard() {
     },
     {
       label: 'Total Savings',
-      value: formatCurrency(totalSavings || 1250),
-      sub: 'This month',
+      value: formatCurrency(totalSavings || 0),
+      sub: 'All orders',
       icon: IndianRupee,
       iconBg: 'bg-purple-50',
       iconColor: 'text-purple-600',
@@ -116,25 +118,31 @@ export default function Dashboard() {
           <h3 className="text-base font-semibold text-gray-900">Order Summary</h3>
           <p className="mb-4 text-xs text-gray-500">Status breakdown</p>
           <div className="relative h-[208px] w-full min-w-[180px]">
-            <ResponsiveContainer width="100%" height={208} minWidth={0}>
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={55}
-                  outerRadius={80}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {chartData.map((entry) => (
-                    <Cell key={entry.key} fill={CHART_COLORS[entry.key] || '#0066ff'} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={208} minWidth={0}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={80}
+                    paddingAngle={3}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry) => (
+                      <Cell key={entry.key} fill={CHART_COLORS[entry.key] || '#0066ff'} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-gray-400">
+                {loading ? 'Loading...' : 'No orders yet'}
+              </div>
+            )}
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold text-gray-900">{demoOrders.length}</span>
+              <span className="text-2xl font-bold text-gray-900">{orders.length}</span>
               <span className="text-xs text-gray-500">Orders</span>
             </div>
           </div>
@@ -159,8 +167,9 @@ export default function Dashboard() {
             <h3 className="text-base font-semibold text-gray-900">Recent Orders</h3>
           </div>
           <div className="divide-y divide-gray-50">
-            {demoOrders.slice(0, 4).map((order) => {
-              const item = order.items[0]
+            {orders.slice(0, 4).map((order) => {
+              const item = order.items?.[0]
+              if (!item) return null
               return (
                 <div key={order.id} className="flex items-center gap-4 px-5 py-3.5">
                   <OrderThumbnail src={item.image} alt={item.name} />
@@ -173,6 +182,9 @@ export default function Dashboard() {
                 </div>
               )
             })}
+            {!loading && orders.length === 0 && (
+              <p className="px-5 py-8 text-center text-sm text-gray-500">No orders yet. Place your first order!</p>
+            )}
           </div>
         </DashboardCard>
 

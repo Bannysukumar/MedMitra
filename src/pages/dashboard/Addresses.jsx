@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { MapPin, Plus, Pencil, Trash2 } from 'lucide-react'
-import { demoAddresses } from '../../data/mockData'
+import { useAuth } from '../../contexts/AuthContext'
+import { useUserAddresses } from '../../hooks/useFirestore'
+import { addAddress, deleteAddress } from '../../services/firestoreService'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Modal from '../../components/ui/Modal'
@@ -8,11 +10,13 @@ import Input from '../../components/ui/Input'
 import toast from 'react-hot-toast'
 
 export default function Addresses() {
-  const [addresses, setAddresses] = useState(demoAddresses)
+  const { user } = useAuth()
+  const { data: addresses } = useUserAddresses(user?.uid)
   const [showModal, setShowModal] = useState(false)
 
-  const handleDelete = (id) => {
-    setAddresses(addresses.filter((a) => a.id !== id))
+  const handleDelete = async (id) => {
+    if (!user) return
+    await deleteAddress(user.uid, id)
     toast.success('Address deleted')
   }
 
@@ -59,23 +63,40 @@ export default function Addresses() {
             </p>
           </Card>
         ))}
+        {addresses.length === 0 && (
+          <Card className="col-span-full py-12 text-center text-gray-500">
+            No saved addresses yet. Add your first delivery address.
+          </Card>
+        )}
       </div>
 
       <Modal open={showModal} onClose={() => setShowModal(false)} title="Add New Address">
         <form
           className="space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault()
+            if (!user) return
+            const form = e.target
+            await addAddress(user.uid, {
+              label: form.label.value,
+              fullName: form.fullName.value,
+              phone: form.phone.value,
+              address: form.address.value,
+              city: form.city.value,
+              state: form.state.value || '',
+              pincode: form.pincode.value,
+              isDefault: addresses.length === 0,
+            })
             toast.success('Address saved')
             setShowModal(false)
           }}
         >
-          <Input label="Label" placeholder="Home, Work..." required />
-          <Input label="Full Name" required />
-          <Input label="Phone" required />
-          <Input label="Address" required />
-          <Input label="City" required />
-          <Input label="Pincode" required />
+          <Input label="Label" name="label" placeholder="Home, Work..." required />
+          <Input label="Full Name" name="fullName" required />
+          <Input label="Phone" name="phone" required />
+          <Input label="Address" name="address" required />
+          <Input label="City" name="city" required />
+          <Input label="Pincode" name="pincode" required />
           <Button type="submit" size="full">Save Address</Button>
         </form>
       </Modal>

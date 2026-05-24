@@ -1,48 +1,37 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { Shield, Mail, Lock, Heart } from 'lucide-react'
+import { Shield, Mail, Lock } from 'lucide-react'
+import { useAuth } from '../../contexts/AuthContext'
+import Logo from '../../components/ui/Logo'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import toast from 'react-hot-toast'
 
-const DEMO_ADMIN = {
-  uid: 'admin-demo',
-  email: 'admin@medmitra.com',
-  displayName: 'Admin User',
-  role: 'admin',
-  plan: 'premium',
-  emailVerified: true,
-}
-
 export default function AdminLogin() {
   const navigate = useNavigate()
+  const { adminLogin } = useAuth()
   const [loading, setLoading] = useState(false)
   const { register, handleSubmit } = useForm({
-    defaultValues: { email: 'admin@medmitra.com', password: 'admin123' },
+    defaultValues: { email: '', password: '' },
   })
 
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     setLoading(true)
-    localStorage.setItem('medmitra-admin', 'true')
-    localStorage.setItem('medmitra-demo-user', JSON.stringify(DEMO_ADMIN))
-    toast.success('Admin login successful (demo)')
-    setLoading(false)
-    navigate('/admin')
-    window.location.reload()
+    try {
+      await adminLogin(data)
+      navigate('/admin')
+    } catch (err) {
+      toast.error(err.message || 'Admin login failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-[#eef5ff] px-4 py-10">
       <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600">
-            <Heart className="h-5 w-5 text-white" fill="white" />
-          </div>
-          <span className="text-xl font-bold text-gray-900">
-            Med<span className="text-primary-600">Mitra</span>
-          </span>
-        </Link>
+        <Logo to="/" size="lg" className="mb-8 flex justify-center" />
 
         <div className="rounded-2xl border border-gray-100 bg-white p-7 shadow-xl shadow-primary-600/[0.08] sm:p-8">
           <div className="mb-6 flex flex-col items-center text-center">
@@ -59,14 +48,14 @@ export default function AdminLogin() {
               type="email"
               icon={Mail}
               placeholder="admin@medmitra.com"
-              {...register('email')}
+              {...register('email', { required: true })}
             />
             <Input
               label="Password"
               type="password"
               icon={Lock}
               placeholder="Enter your password"
-              {...register('password')}
+              {...register('password', { required: true })}
             />
             <Button type="submit" size="full" loading={loading} className="!py-3.5">
               Sign In as Admin
@@ -74,7 +63,7 @@ export default function AdminLogin() {
           </form>
 
           <p className="mt-5 text-center text-xs text-gray-400">
-            Demo: any credentials work. Sets admin in localStorage.
+            Requires a Firebase account with role set to &quot;admin&quot; in Firestore.
           </p>
         </div>
 

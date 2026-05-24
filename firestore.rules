@@ -17,8 +17,17 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isSignedIn() && request.auth.uid == userId;
-      allow update: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
+
+      match /addresses/{addrId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /notifications/{notifId} {
+        allow read, update, delete: if isOwner(userId);
+        allow create: if isOwner(userId) || isAdmin();
+      }
     }
 
     match /orders/{orderId} {
@@ -26,6 +35,7 @@ service cloud.firestore {
         (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update: if isAdmin();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
     }
 
     match /prescriptions/{rxId} {
@@ -33,6 +43,7 @@ service cloud.firestore {
         (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update: if isAdmin();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
     }
 
     match /medicines/{medId} {
@@ -43,6 +54,36 @@ service cloud.firestore {
     match /blog/{postId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    match /faqs/{faqId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /team/{memberId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /pricing/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /siteStats/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /supportTickets/{ticketId} {
+      allow create: if true;
+      allow read, update: if isAdmin();
     }
   }
 }

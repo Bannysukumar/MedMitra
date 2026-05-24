@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Heart, Menu, X, ShoppingCart, Phone } from 'lucide-react'
+import { Menu, X, ShoppingCart, Phone } from 'lucide-react'
 import { NAV_LINKS } from '../../config/constants'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCartStore } from '../../stores/useStore'
 import Button from '../ui/Button'
+import Logo from '../ui/Logo'
 import { cn } from '../../utils/helpers'
 
 export default function Navbar() {
@@ -26,14 +27,7 @@ export default function Navbar() {
 
       <div className="border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 shadow-lg shadow-primary-600/30">
-              <Heart className="h-5 w-5 text-white" fill="white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-gray-900">
-              Med<span className="text-primary-600">Mitra</span>
-            </span>
-          </Link>
+          <Logo to="/" size="md" />
 
           <nav className="hidden items-center gap-0.5 xl:flex">
             {NAV_LINKS.map((link) => (

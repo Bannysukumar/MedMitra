@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom'
 import {
-  Heart,
   LayoutDashboard,
   Users,
   Pill,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react'
 import { ADMIN_LINKS } from '../../config/constants'
 import { useAuth } from '../../contexts/AuthContext'
+import Logo from '../ui/Logo'
 import { cn } from '../../utils/helpers'
 
 const iconMap = {
@@ -42,7 +42,6 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleLogout = () => {
-    localStorage.removeItem('medmitra-admin')
     logout()
   }
 
@@ -65,12 +64,7 @@ export default function AdminLayout() {
         )}
       >
         <div className="flex h-[72px] items-center justify-between border-b border-white/10 px-6">
-          <Link to="/admin" className="flex items-center gap-2.5" onClick={() => setSidebarOpen(false)}>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600">
-              <Heart className="h-4 w-4 text-white" fill="white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">MedMitra</span>
-          </Link>
+          <Logo to="/admin" size="md" onClick={() => setSidebarOpen(false)} />
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}

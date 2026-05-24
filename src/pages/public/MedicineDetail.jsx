@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { Star, ShoppingCart, Heart, ArrowLeft } from 'lucide-react'
-import { medicines } from '../../data/mockData'
+import { useMedicines } from '../../hooks/useFirestore'
 import { useCartStore, useWishlistStore } from '../../stores/useStore'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
@@ -9,9 +9,18 @@ import toast from 'react-hot-toast'
 
 export default function MedicineDetail() {
   const { id } = useParams()
+  const { data: medicines, loading } = useMedicines()
   const med = medicines.find((m) => m.id === id)
   const addToCart = useCartStore((s) => s.addItem)
   const { toggle, isInWishlist } = useWishlistStore()
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-16 text-center">
+        <p className="text-gray-600">Loading medicine...</p>
+      </div>
+    )
+  }
 
   if (!med) {
     return (

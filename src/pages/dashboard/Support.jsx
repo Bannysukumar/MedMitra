@@ -1,5 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { MessageCircle, Mail, Phone, Clock, Headphones } from 'lucide-react'
+import { useAuth } from '../../contexts/AuthContext'
+import { submitSupportTicket } from '../../services/firestoreService'
 import Card from '../../components/ui/Card'
 import Input, { Textarea } from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
@@ -30,11 +32,24 @@ const CONTACT_OPTIONS = [
 ]
 
 export default function Support() {
+  const { user, displayName } = useAuth()
   const { register, handleSubmit, reset } = useForm()
 
-  const onSubmit = () => {
-    toast.success('Support ticket submitted. We will respond within 24 hours.')
-    reset()
+  const onSubmit = async (data) => {
+    try {
+      await submitSupportTicket({
+        userId: user?.uid || null,
+        name: data.name || displayName,
+        email: data.email || user?.email,
+        subject: data.subject,
+        message: data.message,
+        source: 'dashboard',
+      })
+      toast.success('Support ticket submitted. We will respond within 24 hours.')
+      reset()
+    } catch {
+      toast.error('Failed to submit ticket. Please try again.')
+    }
   }
 
   return (

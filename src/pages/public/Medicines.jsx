@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Star, ShoppingCart, Filter, Package } from 'lucide-react'
-import { medicines } from '../../data/mockData'
 import { MEDICINE_CATEGORIES } from '../../config/constants'
 import { searchMedicines, getSymptomSuggestions } from '../../services/searchService'
+import { useMedicines } from '../../hooks/useFirestore'
+import { useCartStore } from '../../stores/useStore'
 import PageHero from '../../components/marketing/PageHero'
 import CTASection from '../../components/marketing/CTASection'
 import Card from '../../components/ui/Card'
@@ -12,18 +13,21 @@ import { formatCurrency, cn } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 
 export default function Medicines() {
+  const { data: medicines, loading, error } = useMedicines()
+  const addToCart = useCartStore((s) => s.addItem)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   let filtered = medicines
-  if (query.trim()) filtered = searchMedicines(query)
+  if (query.trim()) filtered = searchMedicines(query, medicines)
   if (category !== 'All') filtered = filtered.filter((m) => m.category === category)
 
-  const handleAddToCart = (e, name) => {
+  const handleAddToCart = (e, med) => {
     e.preventDefault()
     e.stopPropagation()
-    toast.success(`${name} added to cart`)
+    addToCart(med)
+    toast.success(`${med.name} added to cart`)
   }
 
   return (
@@ -62,6 +66,13 @@ export default function Medicines() {
       </PageHero>
 
       <section className="py-20">
+        {error && (
+          <div className="mx-auto mb-6 max-w-7xl px-4 sm:px-6 lg:px-8">
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Could not load medicines from Firebase. Check your connection and try again.
+            </p>
+          </div>
+        )}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex items-center justify-between lg:hidden">
             <p className="text-sm text-gray-600">
@@ -143,7 +154,9 @@ export default function Medicines() {
               {filtered.length === 0 ? (
                 <Card className="border border-gray-100 py-16 text-center">
                   <Package className="mx-auto h-12 w-12 text-gray-300" />
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">No medicines found</h3>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                    {loading ? 'Loading medicines...' : 'No medicines found'}
+                  </h3>
                   <p className="mt-2 text-sm text-gray-500">Try a different search or category.</p>
                 </Card>
               ) : (
@@ -177,7 +190,7 @@ export default function Medicines() {
                             <p className="text-xl font-bold text-primary-600">{formatCurrency(med.price)}</p>
                             <Button
                               size="sm"
-                              onClick={(e) => handleAddToCart(e, med.name)}
+                              onClick={(e) => handleAddToCart(e, med)}
                               className="shrink-0"
                             >
                               <ShoppingCart className="h-4 w-4" />

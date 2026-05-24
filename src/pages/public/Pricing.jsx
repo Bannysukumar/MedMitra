@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Check, X } from 'lucide-react'
-import { pricingPlans } from '../../data/mockData'
+import { Check, X, CreditCard } from 'lucide-react'
+import { usePricing } from '../../hooks/useFirestore'
 import PageHero from '../../components/marketing/PageHero'
 import SectionHeader from '../../components/marketing/SectionHeader'
 import CTASection from '../../components/marketing/CTASection'
@@ -27,6 +27,8 @@ function CellValue({ value }) {
 }
 
 export default function Pricing() {
+  const { data: pricingPlans, loading } = usePricing()
+
   return (
     <div>
       <PageHero
@@ -39,6 +41,14 @@ export default function Pricing() {
 
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {loading ? (
+            <p className="text-center text-gray-500">Loading plans...</p>
+          ) : pricingPlans.length === 0 ? (
+            <div className="rounded-2xl border border-gray-100 bg-white py-16 text-center card-shadow">
+              <CreditCard className="mx-auto h-12 w-12 text-gray-300" />
+              <p className="mt-4 font-medium text-gray-700">Pricing plans will appear here once configured.</p>
+            </div>
+          ) : (
           <div className="grid gap-8 lg:grid-cols-3 lg:items-stretch">
             {pricingPlans.map((plan) => (
               <Card
@@ -86,6 +96,7 @@ export default function Pricing() {
               </Card>
             ))}
           </div>
+          )}
         </div>
       </section>
 

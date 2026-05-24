@@ -1,5 +1,5 @@
 import { ChevronRight, Droplet, Ruler, Weight, AlertCircle, Heart, Calendar, Plus } from 'lucide-react'
-import { demoHealthRecord } from '../../data/mockData'
+import { useAuth } from '../../contexts/AuthContext'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { formatDate } from '../../utils/helpers'
@@ -8,13 +8,25 @@ const RECORDS = (data) => [
   { label: 'Blood Group', value: data.bloodGroup, icon: Droplet, color: 'text-red-500 bg-red-50' },
   { label: 'Height', value: `${data.height} cm`, icon: Ruler, color: 'text-blue-500 bg-blue-50' },
   { label: 'Weight', value: `${data.weight} kg`, icon: Weight, color: 'text-green-500 bg-green-50' },
-  { label: 'Allergies', value: data.allergies.join(', '), icon: AlertCircle, color: 'text-orange-500 bg-orange-50' },
-  { label: 'Chronic Conditions', value: data.chronicDiseases.join(', '), icon: Heart, color: 'text-purple-500 bg-purple-50' },
-  { label: 'Last Checkup', value: formatDate(data.lastCheckup), icon: Calendar, color: 'text-primary-600 bg-primary-50' },
+  { label: 'Allergies', value: data.allergies?.join(', ') || 'None', icon: AlertCircle, color: 'text-orange-500 bg-orange-50' },
+  { label: 'Chronic Conditions', value: data.chronicDiseases?.join(', ') || 'None', icon: Heart, color: 'text-purple-500 bg-purple-50' },
+  { label: 'Last Checkup', value: data.lastCheckup ? formatDate(data.lastCheckup) : 'Not recorded', icon: Calendar, color: 'text-primary-600 bg-primary-50' },
 ]
 
 export default function HealthRecords() {
-  const records = RECORDS(demoHealthRecord)
+  const { profile } = useAuth()
+  const healthData = profile?.healthRecord
+
+  if (!healthData) {
+    return (
+      <Card className="py-16 text-center">
+        <p className="text-gray-600">No health records yet.</p>
+        <p className="mt-2 text-sm text-gray-500">Your health data will appear here once saved to your profile.</p>
+      </Card>
+    )
+  }
+
+  const records = RECORDS(healthData)
 
   return (
     <div className="space-y-5">

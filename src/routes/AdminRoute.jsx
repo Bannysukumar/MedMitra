@@ -4,7 +4,6 @@ import Skeleton from '../components/ui/Skeleton'
 
 export default function AdminRoute({ children }) {
   const { isAdmin, loading } = useAuth()
-  const demoAdmin = localStorage.getItem('medmitra-admin') === 'true'
 
   if (loading) {
     return (
@@ -17,7 +16,7 @@ export default function AdminRoute({ children }) {
     )
   }
 
-  if (!isAdmin && !demoAdmin) {
+  if (!isAdmin) {
     return <Navigate to="/admin/login" replace />
   }
 

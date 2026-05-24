@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { demoOrders } from '../../data/mockData'
+import { useAuth } from '../../contexts/AuthContext'
+import { useUserOrders } from '../../hooks/useFirestore'
+import ProductImage from '../../components/ui/ProductImage'
 import Card from '../../components/ui/Card'
 import StatusPill from '../../components/ui/StatusPill'
 import { formatCurrency, formatDate, cn } from '../../utils/helpers'
@@ -14,10 +16,12 @@ const TABS = [
 ]
 
 export default function MyOrders() {
+  const { user } = useAuth()
+  const { data: orders, loading } = useUserOrders(user?.uid)
   const [activeTab, setActiveTab] = useState('all')
 
   const filtered =
-    activeTab === 'all' ? demoOrders : demoOrders.filter((o) => o.status === activeTab)
+    activeTab === 'all' ? orders : orders.filter((o) => o.status === activeTab)
 
   return (
     <div className="space-y-5">
@@ -40,15 +44,17 @@ export default function MyOrders() {
       </div>
 
       <div className="space-y-3">
-        {filtered.map((order) => {
-          const item = order.items[0]
+        {loading && <p className="py-12 text-center text-gray-500">Loading orders...</p>}
+        {!loading && filtered.map((order) => {
+          const item = order.items?.[0]
+          if (!item) return null
           return (
             <Card key={order.id} className="!p-4">
               <div className="flex flex-wrap items-center gap-4">
-                <img
+                <ProductImage
                   src={item.image}
                   alt={item.name}
-                  className="h-14 w-14 rounded-xl object-cover ring-1 ring-gray-100"
+                  className="h-14 w-14 rounded-xl"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-gray-900">{item.name}</p>
@@ -60,7 +66,7 @@ export default function MyOrders() {
                 <div className="flex items-center gap-4">
                   <StatusPill status={order.status} />
                   <Link
-                    to={`/dashboard/orders`}
+                    to="/dashboard/orders"
                     className="text-sm font-semibold text-primary-600 hover:underline"
                   >
                     View Details
@@ -70,7 +76,7 @@ export default function MyOrders() {
             </Card>
           )
         })}
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <p className="py-12 text-center text-gray-500">No orders in this category.</p>
         )}
       </div>

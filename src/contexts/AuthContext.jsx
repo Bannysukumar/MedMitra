@@ -10,45 +10,35 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth'
 import { doc, setDoc, getDoc } from 'firebase/firestore'
-import { auth, db, googleProvider, facebookProvider, isFirebaseConfigured } from '../config/firebase'
+import { auth, db, googleProvider, facebookProvider } from '../config/firebase'
+import { clearDemoUserData } from '../services/firestoreService'
+import { useCartStore, useWishlistStore } from '../stores/useStore'
 import toast from 'react-hot-toast'
 
 const AuthContext = createContext(null)
-
-const DEMO_USER = {
-  uid: 'demo-user',
-  email: 'demo@medmitra.com',
-  displayName: 'John Doe',
-  role: 'user',
-  plan: 'premium',
-  photoURL: null,
-  phone: '+91 98765 43210',
-  emailVerified: true,
-}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!isFirebaseConfigured || !auth) {
-      const stored = localStorage.getItem('medmitra-demo-user')
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        setUser(parsed)
-        setProfile(parsed)
-      }
-      setLoading(false)
-      return
-    }
+  const loadProfile = async (firebaseUser) => {
+    const profileDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+    if (profileDoc.exists()) return profileDoc.data()
+    return { role: 'user', plan: 'free' }
+  }
 
+  useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser)
-        const profileDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-        if (profileDoc.exists()) setProfile(profileDoc.data())
-        else setProfile({ role: 'user', plan: 'free' })
+        try {
+          await clearDemoUserData(firebaseUser.uid)
+        } catch (err) {
+          console.error('Demo data cleanup failed:', err)
+        }
+        const data = await loadProfile(firebaseUser)
+        setProfile(data)
       } else {
         setUser(null)
         setProfile(null)
@@ -59,15 +49,6 @@ export function AuthProvider({ children }) {
   }, [])
 
   const signup = async ({ fullName, email, phone, password }) => {
-    if (!isFirebaseConfigured) {
-      const demo = { ...DEMO_USER, displayName: fullName, email, phone }
-      localStorage.setItem('medmitra-demo-user', JSON.stringify(demo))
-      setUser(demo)
-      setProfile(demo)
-      toast.success('Account created (demo mode)')
-      return demo
-    }
-
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     await updateProfile(cred.user, { displayName: fullName })
     await sendEmailVerification(cred.user)
@@ -84,29 +65,24 @@ export function AuthProvider({ children }) {
     return cred.user
   }
 
-  const login = async ({ email, password, remember }) => {
-    if (!isFirebaseConfigured) {
-      const demo = { ...DEMO_USER, email }
-      if (remember) localStorage.setItem('medmitra-demo-user', JSON.stringify(demo))
-      setUser(demo)
-      setProfile(demo)
-      toast.success('Welcome back!')
-      return demo
-    }
+  const login = async ({ email, password }) => {
     const cred = await signInWithEmailAndPassword(auth, email, password)
     toast.success('Welcome back!')
     return cred.user
   }
 
-  const socialLogin = async (provider) => {
-    if (!isFirebaseConfigured) {
-      const demo = DEMO_USER
-      localStorage.setItem('medmitra-demo-user', JSON.stringify(demo))
-      setUser(demo)
-      setProfile(demo)
-      toast.success('Signed in with social (demo)')
-      return demo
+  const adminLogin = async ({ email, password }) => {
+    const cred = await signInWithEmailAndPassword(auth, email, password)
+    const profileDoc = await getDoc(doc(db, 'users', cred.user.uid))
+    if (profileDoc.data()?.role !== 'admin') {
+      await signOut(auth)
+      throw new Error('Admin access only. Set role to "admin" in Firestore users collection.')
     }
+    toast.success('Welcome, Admin!')
+    return cred.user
+  }
+
+  const socialLogin = async (provider) => {
     const prov = provider === 'google' ? googleProvider : facebookProvider
     const cred = await signInWithPopup(auth, prov)
     const exists = await getDoc(doc(db, 'users', cred.user.uid))
@@ -125,24 +101,29 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
-    if (!isFirebaseConfigured) {
-      localStorage.removeItem('medmitra-demo-user')
-      setUser(null)
-      setProfile(null)
-      toast.success('Logged out')
-      return
-    }
+    useCartStore.getState().clearCart()
+    useWishlistStore.setState({ items: [] })
     await signOut(auth)
     toast.success('Logged out')
   }
 
   const resetPassword = async (email) => {
-    if (!isFirebaseConfigured) {
-      toast.success('Reset link sent (demo mode)')
-      return
-    }
     await sendPasswordResetEmail(auth, email)
     toast.success('Password reset email sent!')
+  }
+
+  const updateUserProfile = async (data) => {
+    if (!user) return
+    await setDoc(doc(db, 'users', user.uid), data, { merge: true })
+    if (data.fullName) await updateProfile(user, { displayName: data.fullName })
+    setProfile((prev) => ({ ...prev, ...data }))
+    toast.success('Profile updated successfully')
+  }
+
+  const refreshProfile = async () => {
+    if (!user) return
+    const data = await loadProfile(user)
+    setProfile(data)
   }
 
   const isAdmin = profile?.role === 'admin'
@@ -157,9 +138,12 @@ export function AuthProvider({ children }) {
         loading,
         signup,
         login,
+        adminLogin,
         socialLogin,
         logout,
         resetPassword,
+        updateUserProfile,
+        refreshProfile,
         isAdmin,
         displayName,
         plan,

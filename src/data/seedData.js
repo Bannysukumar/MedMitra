@@ -1,3 +1,5 @@
+/** Initial catalog/content for admin seed only — not used in the UI. */
+
 export const medicines = [
   {
     id: 'med-1',
@@ -203,91 +205,6 @@ export const medicines = [
     stock: 420,
     symptoms: ['pain', 'headache'],
   },
-]
-
-export const demoOrders = [
-  {
-    id: 'ORD-001',
-    items: [{ medicineId: 'med-1', name: 'Paracetamol 650mg', quantity: 2, price: 28, image: medicines[0].image }],
-    status: 'delivered',
-    total: 56,
-    savings: 12,
-    createdAt: '2024-05-15',
-    address: '123 Health Street, Mumbai',
-  },
-  {
-    id: 'ORD-002',
-    items: [{ medicineId: 'med-3', name: 'Vitamin D3 60K', quantity: 1, price: 120, image: medicines[2].image }],
-    status: 'pending',
-    total: 120,
-    savings: 0,
-    createdAt: '2024-05-20',
-    address: '456 Wellness Ave, Mumbai',
-  },
-  {
-    id: 'ORD-003',
-    items: [{ medicineId: 'med-11', name: 'Sinarest Tablet', quantity: 3, price: 42, image: medicines[10].image }],
-    status: 'delivered',
-    total: 126,
-    savings: 18,
-    createdAt: '2024-05-10',
-    address: '123 Health Street, Mumbai',
-  },
-  {
-    id: 'ORD-004',
-    items: [{ medicineId: 'med-5', name: 'Atorvastatin 10mg', quantity: 1, price: 85, image: medicines[4].image }],
-    status: 'processing',
-    total: 85,
-    savings: 5,
-    createdAt: '2024-05-22',
-    address: '789 Care Lane, Pune',
-  },
-]
-
-export const demoPrescriptions = [
-  { id: 'rx-1', name: 'Prescription_May2024.pdf', uploadedAt: '2024-05-01', status: 'approved', url: '#' },
-  { id: 'rx-2', name: 'Prescription_April2024.jpg', uploadedAt: '2024-04-15', status: 'under_review', url: '#' },
-]
-
-export const demoHealthRecord = {
-  bloodGroup: 'O+',
-  height: 175,
-  weight: 72,
-  allergies: ['Penicillin', 'Dust'],
-  chronicDiseases: ['Hypertension'],
-  medications: ['Atorvastatin 10mg', 'Metformin 500mg'],
-  lastCheckup: '2024-04-20',
-}
-
-export const demoAddresses = [
-  {
-    id: 'addr-1',
-    label: 'Home',
-    fullName: 'John Doe',
-    phone: '+91 98765 43210',
-    address: '123 Health Street, Andheri West',
-    city: 'Mumbai',
-    state: 'Maharashtra',
-    pincode: '400058',
-    isDefault: true,
-  },
-  {
-    id: 'addr-2',
-    label: 'Work',
-    fullName: 'John Doe',
-    phone: '+91 98765 43210',
-    address: '456 Corporate Park, BKC',
-    city: 'Mumbai',
-    state: 'Maharashtra',
-    pincode: '400051',
-    isDefault: false,
-  },
-]
-
-export const demoNotifications = [
-  { id: 'n1', title: 'Order Delivered', message: 'Your order ORD-001 has been delivered.', type: 'order', read: false, createdAt: '2024-05-16' },
-  { id: 'n2', title: 'Prescription Approved', message: 'Your prescription has been approved.', type: 'prescription', read: true, createdAt: '2024-05-02' },
-  { id: 'n3', title: 'New Medicine Available', message: 'Check out new arrivals in Vitamins category.', type: 'system', read: false, createdAt: '2024-05-18' },
 ]
 
 export const testimonials = [

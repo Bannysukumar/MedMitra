@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
 import { useCartStore } from '../../stores/useStore'
+import ProductImage from '../../components/ui/ProductImage'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import { formatCurrency } from '../../utils/helpers'
@@ -32,7 +33,7 @@ export default function Cart() {
           {items.map((item) => (
             <Card key={item.id}>
               <div className="flex gap-4">
-                <img src={item.image} alt={item.name} className="h-20 w-20 rounded-xl object-cover" />
+                <ProductImage src={item.image} alt={item.name} className="h-20 w-20 rounded-xl" />
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
                   <p className="text-primary-600 font-bold">{formatCurrency(item.price)}</p>

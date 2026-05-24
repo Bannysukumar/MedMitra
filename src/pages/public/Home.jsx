@@ -13,13 +13,15 @@ import {
   UserPlus,
   Package,
   MapPin,
+  Pill,
+  HeartPulse,
 } from 'lucide-react'
-import { stats, testimonials, faqs } from '../../data/mockData'
+import { useTestimonials, useFaqs, useSiteStats } from '../../hooks/useFirestore'
 import Button from '../../components/ui/Button'
 import StatGrid from '../../components/marketing/StatGrid'
 import SectionHeader from '../../components/marketing/SectionHeader'
 import CTASection from '../../components/marketing/CTASection'
-import { cn } from '../../utils/helpers'
+import { cn, formatStatValue } from '../../utils/helpers'
 
 const FEATURES = [
   { icon: Search, title: 'Medicine Search', desc: 'Smart search by name, category, brand, or symptoms', color: 'bg-blue-50 text-blue-600' },
@@ -38,8 +40,47 @@ const STEPS = [
   { icon: MapPin, title: 'Track Delivery', desc: 'Medicines delivered in 24–48 hours' },
 ]
 
+function HeroIllustration() {
+  return (
+    <div className="relative hidden lg:block">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 p-10 shadow-2xl">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-cyan-400/20 blur-2xl" />
+        <div className="relative flex flex-col items-center gap-8 py-8">
+          <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-white/15 backdrop-blur-sm">
+            <HeartPulse className="h-14 w-14 text-white" strokeWidth={1.5} />
+          </div>
+          <div className="grid w-full max-w-xs grid-cols-2 gap-4">
+            {[
+              { icon: Pill, label: 'Medicines' },
+              { icon: Upload, label: 'Prescriptions' },
+              { icon: Activity, label: 'Health Records' },
+              { icon: Truck, label: 'Delivery' },
+            ].map(({ icon: Icon, label }) => (
+              <div
+                key={label}
+                className="flex flex-col items-center gap-2 rounded-2xl bg-white/10 px-4 py-5 backdrop-blur-sm"
+              >
+                <Icon className="h-6 w-6 text-cyan-200" />
+                <span className="text-xs font-semibold text-white/90">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [openFaq, setOpenFaq] = useState(0)
+  const { data: testimonials, loading: testimonialsLoading } = useTestimonials()
+  const { data: faqs, loading: faqsLoading } = useFaqs()
+  const { stats: siteStats, loading: statsLoading } = useSiteStats()
+
+  const trustLabel = siteStats?.users
+    ? `Trusted by ${siteStats.users} users across India`
+    : 'Trusted healthcare platform across India'
 
   return (
     <div>
@@ -50,7 +91,7 @@ export default function Home() {
             <div className="animate-fade-in">
               <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-4 py-1.5 text-sm font-semibold text-primary-700 shadow-sm">
                 <Sparkles className="h-4 w-4 text-primary-600" />
-                Trusted by {stats.users} users across India
+                {trustLabel}
               </span>
               <h1 className="mt-6 text-4xl font-bold leading-[1.12] tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
                 Your Complete{' '}
@@ -89,34 +130,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative hidden lg:block">
-              <div className="relative rounded-3xl bg-white p-2 shadow-2xl ring-1 ring-gray-100">
-                <img
-                  src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop"
-                  alt="Healthcare professional"
-                  className="rounded-2xl"
-                />
-              </div>
-              <div className="absolute -bottom-5 -left-5 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-xl">
-                <p className="text-2xl font-bold text-primary-600">{stats.medicines}</p>
-                <p className="text-sm font-semibold text-gray-800">Medicines Available</p>
-              </div>
-              <div className="absolute -right-3 top-6 rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-xl">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                    <Truck className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900">Order Delivered</p>
-                    <p className="text-xs font-medium text-gray-600">2 hours ago</p>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute left-8 top-8 rounded-xl border border-gray-100 bg-white px-3 py-2 shadow-lg">
-                <p className="text-xs font-semibold text-gray-900">Dr. Sarah Ahmed</p>
-                <p className="text-[11px] font-medium text-primary-600">Cardiologist</p>
-              </div>
-            </div>
+            <HeroIllustration />
           </div>
         </div>
       </section>
@@ -124,10 +138,10 @@ export default function Home() {
       <StatGrid
         overlap
         stats={[
-          { label: 'Registered Users', value: stats.users },
-          { label: 'Medicines Available', value: stats.medicines },
-          { label: 'Orders Delivered', value: stats.orders },
-          { label: 'Prescriptions Processed', value: stats.prescriptions },
+          { label: 'Registered Users', value: statsLoading ? '...' : formatStatValue(siteStats, 'users') },
+          { label: 'Medicines Available', value: statsLoading ? '...' : formatStatValue(siteStats, 'medicines') },
+          { label: 'Orders Delivered', value: statsLoading ? '...' : formatStatValue(siteStats, 'orders') },
+          { label: 'Prescriptions Processed', value: statsLoading ? '...' : formatStatValue(siteStats, 'prescriptions') },
         ]}
       />
 
@@ -189,66 +203,80 @@ export default function Home() {
             title="Loved by patients across India"
             subtitle="Real stories from people who trust MedMitra"
           />
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
-            {testimonials.map((t) => (
-              <div key={t.id} className="rounded-2xl border border-gray-100 bg-white p-6 card-shadow">
-                <div className="flex gap-1">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="mt-4 leading-relaxed text-gray-800">&ldquo;{t.text}&rdquo;</p>
-                <div className="mt-6 flex items-center gap-3 border-t border-gray-100 pt-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-800">
-                    {t.name.charAt(0)}
+          {testimonialsLoading ? (
+            <p className="mt-14 text-center text-gray-500">Loading testimonials...</p>
+          ) : testimonials.length === 0 ? (
+            <p className="mt-14 text-center text-gray-500">No testimonials yet. Check back soon.</p>
+          ) : (
+            <div className="mt-14 grid gap-6 md:grid-cols-3">
+              {testimonials.map((t) => (
+                <div key={t.id} className="rounded-2xl border border-gray-100 bg-white p-6 card-shadow">
+                  <div className="flex gap-1">
+                    {Array.from({ length: t.rating }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    ))}
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{t.name}</p>
-                    <p className="text-sm font-medium text-gray-600">{t.role}</p>
+                  <p className="mt-4 leading-relaxed text-gray-800">&ldquo;{t.text}&rdquo;</p>
+                  <div className="mt-6 flex items-center gap-3 border-t border-gray-100 pt-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-800">
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{t.name}</p>
+                      <p className="text-sm font-medium text-gray-600">{t.role}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <SectionHeader
-            eyebrow="FAQ"
-            title="Frequently asked questions"
-            subtitle="Quick answers to common questions"
-          />
-          <div className="mt-10 space-y-3">
-            {faqs.slice(0, 4).map((faq, i) => (
-              <div key={faq.question} className="overflow-hidden rounded-2xl border border-gray-100 bg-white card-shadow">
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(openFaq === i ? -1 : i)}
-                  className="flex w-full items-center justify-between px-6 py-4 text-left font-semibold text-gray-900"
-                >
-                  {faq.question}
-                  <ChevronDown className={cn('h-5 w-5 shrink-0 text-gray-500 transition', openFaq === i && 'rotate-180')} />
-                </button>
-                {openFaq === i && (
-                  <div className="border-t border-gray-100 px-6 py-4 text-sm leading-relaxed text-gray-700">
-                    {faq.answer}
-                  </div>
-                )}
-              </div>
-            ))}
+      {(faqsLoading || faqs.length > 0) && (
+        <section className="py-20 bg-white">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6">
+            <SectionHeader
+              eyebrow="FAQ"
+              title="Frequently asked questions"
+              subtitle="Quick answers to common questions"
+            />
+            {faqsLoading ? (
+              <p className="mt-10 text-center text-gray-500">Loading FAQs...</p>
+            ) : (
+              <>
+                <div className="mt-10 space-y-3">
+                  {faqs.slice(0, 4).map((faq, i) => (
+                    <div key={faq.question} className="overflow-hidden rounded-2xl border border-gray-100 bg-white card-shadow">
+                      <button
+                        type="button"
+                        onClick={() => setOpenFaq(openFaq === i ? -1 : i)}
+                        className="flex w-full items-center justify-between px-6 py-4 text-left font-semibold text-gray-900"
+                      >
+                        {faq.question}
+                        <ChevronDown className={cn('h-5 w-5 shrink-0 text-gray-500 transition', openFaq === i && 'rotate-180')} />
+                      </button>
+                      {openFaq === i && (
+                        <div className="border-t border-gray-100 px-6 py-4 text-sm leading-relaxed text-gray-700">
+                          {faq.answer}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 text-center">
+                  <Link
+                    to="/faq"
+                    className="inline-flex items-center gap-2 font-semibold text-primary-600 hover:underline"
+                  >
+                    View all FAQs <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
-          <div className="mt-8 text-center">
-            <Link
-              to="/faq"
-              className="inline-flex items-center gap-2 font-semibold text-primary-600 hover:underline"
-            >
-              View all FAQs <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <CTASection secondaryLabel="Browse Medicines" secondaryTo="/medicines" />
     </div>

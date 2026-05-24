@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { Mail, Phone, MapPin, Send, Clock, MessageSquare } from 'lucide-react'
+import { submitSupportTicket } from '../../services/firestoreService'
 import PageHero from '../../components/marketing/PageHero'
 import CTASection from '../../components/marketing/CTASection'
 import Button from '../../components/ui/Button'
@@ -18,9 +19,20 @@ const inputClass =
 export default function Contact() {
   const { register, handleSubmit, reset } = useForm()
 
-  const onSubmit = () => {
-    toast.success('Message sent! We will respond within 24 hours.')
-    reset()
+  const onSubmit = async (data) => {
+    try {
+      await submitSupportTicket({
+        name: data.name,
+        email: data.email,
+        subject: data.subject || 'Contact form',
+        message: data.message,
+        source: 'contact',
+      })
+      toast.success('Message sent! We will respond within 24 hours.')
+      reset()
+    } catch {
+      toast.error('Failed to send message. Please try again.')
+    }
   }
 
   return (

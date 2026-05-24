@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { ChevronDown, Search, HelpCircle, MessageCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { faqs } from '../../data/mockData'
+import { useFaqs } from '../../hooks/useFirestore'
 import PageHero from '../../components/marketing/PageHero'
 import CTASection from '../../components/marketing/CTASection'
 import Button from '../../components/ui/Button'
@@ -16,6 +16,7 @@ const CATEGORY_LABELS = {
 }
 
 export default function FAQ() {
+  const { data: faqs, loading } = useFaqs()
   const [open, setOpen] = useState(null)
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState('all')
@@ -90,7 +91,15 @@ export default function FAQ() {
 
       <section className="py-16 mesh-bg sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          {filteredFaqs.length === 0 ? (
+          {loading ? (
+            <p className="py-12 text-center text-gray-500">Loading FAQs...</p>
+          ) : faqs.length === 0 ? (
+            <div className="rounded-2xl border border-gray-200 bg-white py-12 text-center card-shadow">
+              <HelpCircle className="mx-auto h-12 w-12 text-gray-300" />
+              <h3 className="mt-4 font-bold text-gray-900">No FAQs yet</h3>
+              <p className="mt-2 text-sm font-medium text-gray-600">Check back soon or contact support.</p>
+            </div>
+          ) : filteredFaqs.length === 0 ? (
             <div className="rounded-2xl border border-gray-200 bg-white py-12 text-center card-shadow">
               <HelpCircle className="mx-auto h-12 w-12 text-gray-300" />
               <h3 className="mt-4 font-bold text-gray-900">No results found</h3>

@@ -1,5 +1,6 @@
 import { Heart, Target, Eye, Users, Award, Globe, CheckCircle } from 'lucide-react'
-import { stats } from '../../data/mockData'
+import { useSiteStats } from '../../hooks/useFirestore'
+import { formatStatValue } from '../../utils/helpers'
 import PageHero from '../../components/marketing/PageHero'
 import SectionHeader from '../../components/marketing/SectionHeader'
 import StatGrid from '../../components/marketing/StatGrid'
@@ -22,6 +23,8 @@ const WHY = [
 ]
 
 export default function About() {
+  const { stats: siteStats, loading: statsLoading } = useSiteStats()
+
   return (
     <div>
       <PageHero
@@ -34,10 +37,10 @@ export default function About() {
 
       <StatGrid
         stats={[
-          { label: 'Happy Users', value: stats.users },
-          { label: 'Medicines', value: stats.medicines },
-          { label: 'Cities Served', value: '500+' },
-          { label: 'Team Members', value: '200+' },
+          { label: 'Registered Users', value: statsLoading ? '...' : formatStatValue(siteStats, 'users') },
+          { label: 'Medicines', value: statsLoading ? '...' : formatStatValue(siteStats, 'medicines') },
+          { label: 'Orders Delivered', value: statsLoading ? '...' : formatStatValue(siteStats, 'orders') },
+          { label: 'Prescriptions Processed', value: statsLoading ? '...' : formatStatValue(siteStats, 'prescriptions') },
         ]}
       />
 
@@ -52,19 +55,17 @@ export default function About() {
               />
               <p className="mt-6 leading-relaxed text-gray-600">
                 MedMitra was founded in 2020 when our founders saw how hard it was for families to access
-                essential medicines. Today we serve {stats.users} users with licensed pharmacies and
-                cutting-edge technology.
+                essential medicines. Today we combine licensed pharmacies with cutting-edge technology to
+                deliver care at your doorstep.
               </p>
               <p className="mt-4 leading-relaxed text-gray-600">
                 From prescription verification to health record management, we combine technology with
                 compassionate care.
               </p>
             </div>
-            <img
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=700&h=500&fit=crop"
-              alt="Medical team"
-              className="rounded-3xl shadow-2xl"
-            />
+            <div className="flex min-h-[320px] items-center justify-center rounded-3xl bg-gradient-to-br from-primary-600 to-primary-800 p-12 shadow-2xl">
+              <Heart className="h-24 w-24 text-white/90" strokeWidth={1.25} />
+            </div>
           </div>
         </div>
       </section>

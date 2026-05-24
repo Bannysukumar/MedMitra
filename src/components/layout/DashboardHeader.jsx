@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Menu, Search, ShoppingCart, Bell } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCartStore } from '../../stores/useStore'
-import { demoNotifications } from '../../data/mockData'
+import { useUserNotifications } from '../../hooks/useFirestore'
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
@@ -20,10 +20,11 @@ const PAGE_TITLES = {
 }
 
 export default function DashboardHeader({ onMenuClick }) {
-  const { displayName, plan } = useAuth()
+  const { displayName, plan, user } = useAuth()
   const location = useLocation()
   const itemCount = useCartStore((s) => s.getItemCount())
-  const unreadCount = demoNotifications.filter((n) => !n.read).length
+  const { data: notifications } = useUserNotifications(user?.uid)
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   const title = PAGE_TITLES[location.pathname] || 'Dashboard'
   const isPremium = plan === 'premium' || plan === 'family'

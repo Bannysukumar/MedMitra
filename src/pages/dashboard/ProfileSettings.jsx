@@ -4,22 +4,25 @@ import { useAuth } from '../../contexts/AuthContext'
 import Card from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
-import toast from 'react-hot-toast'
 
 export default function ProfileSettings() {
-  const { displayName, user, profile } = useAuth()
+  const { displayName, user, profile, updateUserProfile } = useAuth()
 
   const { register, handleSubmit } = useForm({
     defaultValues: {
       fullName: displayName,
       email: user?.email || '',
-      phone: profile?.phone || '+91 98765 43210',
-      dob: '1990-05-15',
+      phone: profile?.phone || '',
+      dob: profile?.dob || '',
     },
   })
 
-  const onSubmit = () => {
-    toast.success('Profile updated successfully')
+  const onSubmit = async (data) => {
+    await updateUserProfile({
+      fullName: data.fullName,
+      phone: data.phone,
+      dob: data.dob,
+    })
   }
 
   return (

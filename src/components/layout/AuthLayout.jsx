@@ -1,6 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import {
-  Heart,
   Shield,
   Truck,
   Clock,
@@ -10,6 +9,7 @@ import {
   Pill,
   Sparkles,
 } from 'lucide-react'
+import Logo from '../ui/Logo'
 
 const AUTH_PANELS = {
   '/login': {
@@ -50,12 +50,13 @@ function AuthIllustration({ type }) {
   if (type === 'signup') {
     return (
       <div className="relative mx-auto w-full max-w-md">
-        <div className="overflow-hidden rounded-3xl bg-white/70 p-3 shadow-xl backdrop-blur-sm ring-1 ring-white/80">
-          <img
-            src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=600&h=500&fit=crop"
-            alt="Healthcare professional"
-            className="h-64 w-full rounded-2xl object-cover object-top"
-          />
+        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-primary-500 to-primary-800 p-10 shadow-xl">
+          <div className="flex flex-col items-center gap-6 py-6">
+            <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/15">
+              <Pill className="h-12 w-12 text-white" strokeWidth={1.5} />
+            </div>
+            <p className="text-center text-lg font-semibold text-white">Start your health journey</p>
+          </div>
         </div>
         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-lg">
           Your Health Partner
@@ -64,7 +65,7 @@ function AuthIllustration({ type }) {
     )
   }
 
-  if (type === 'forgot') {
+    if (type === 'forgot') {
     return (
       <div className="relative mx-auto flex h-72 w-72 items-center justify-center">
         <div className="absolute inset-0 rounded-full bg-primary-200/50" />
@@ -110,14 +111,7 @@ export default function AuthLayout() {
         <div className="pointer-events-none absolute -bottom-10 right-0 h-80 w-80 rounded-full bg-cyan-300/25 blur-3xl" />
 
         <div className="relative flex w-full flex-col justify-between p-10 xl:p-14">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-600 shadow-lg shadow-primary-600/30">
-              <Heart className="h-5 w-5 text-white" fill="white" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900">
-              Med<span className="text-primary-600">Mitra</span>
-            </span>
-          </Link>
+          <Logo to="/" size="lg" />
 
           <div className="space-y-8 py-6">
             <div>
@@ -163,14 +157,7 @@ export default function AuthLayout() {
 
       <div className="auth-form-bg flex w-full flex-col lg:w-[54%] xl:w-[56%]">
         <div className="flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4 lg:hidden">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600">
-              <Heart className="h-4 w-4 text-white" fill="white" />
-            </div>
-            <span className="text-lg font-bold text-gray-900">
-              Med<span className="text-primary-600">Mitra</span>
-            </span>
-          </Link>
+          <Logo to="/" size="sm" />
         </div>
 
         <div className="flex flex-1 flex-col justify-center px-5 py-10 sm:px-10 lg:px-16 xl:px-20">

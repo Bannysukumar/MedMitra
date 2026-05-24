@@ -1,7 +1,6 @@
 import { SYMPTOM_MAP } from '../config/constants'
-import { medicines } from '../data/mockData'
 
-export function searchMedicines(query) {
+export function searchMedicines(query, medicines = []) {
   const q = query.trim().toLowerCase()
   if (!q) return []
 
@@ -27,7 +26,7 @@ export function searchMedicines(query) {
   })
 }
 
-export function searchBySymptom(symptom) {
+export function searchBySymptom(symptom, medicines = []) {
   const key = symptom.trim().toLowerCase()
   const suggestedNames = SYMPTOM_MAP[key] || []
   const fromSymptoms = medicines.filter((m) => m.symptoms?.includes(key))

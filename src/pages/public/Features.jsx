@@ -20,7 +20,8 @@ import CTASection from '../../components/marketing/CTASection'
 import StatGrid from '../../components/marketing/StatGrid'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import { stats } from '../../data/mockData'
+import { useSiteStats } from '../../hooks/useFirestore'
+import { formatStatValue } from '../../utils/helpers'
 import { cn } from '../../utils/helpers'
 
 const BENTO_FEATURES = [
@@ -114,6 +115,8 @@ const DETAILED_FEATURES = [
 ]
 
 export default function Features() {
+  const { stats: siteStats, loading: statsLoading } = useSiteStats()
+
   return (
     <div>
       <PageHero
@@ -139,10 +142,10 @@ export default function Features() {
 
       <StatGrid
         stats={[
-          { label: 'Active Users', value: stats.users },
-          { label: 'Medicines Listed', value: stats.medicines },
-          { label: 'Orders Delivered', value: stats.orders },
-          { label: 'Prescriptions Verified', value: stats.prescriptions },
+          { label: 'Active Users', value: statsLoading ? '...' : formatStatValue(siteStats, 'users') },
+          { label: 'Medicines Listed', value: statsLoading ? '...' : formatStatValue(siteStats, 'medicines') },
+          { label: 'Orders Delivered', value: statsLoading ? '...' : formatStatValue(siteStats, 'orders') },
+          { label: 'Prescriptions Verified', value: statsLoading ? '...' : formatStatValue(siteStats, 'prescriptions') },
         ]}
       />
 

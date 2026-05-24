@@ -26,6 +26,10 @@ export function calculateBMI(weight, heightCm) {
   return (weight / (heightM * heightM)).toFixed(1)
 }
 
+export function formatStatValue(stats, key) {
+  return stats?.[key] ?? '—'
+}
+
 export function generateOrderId() {
   return `ORD-${Date.now().toString(36).toUpperCase()}`
 }

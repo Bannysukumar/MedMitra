@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { Heart, Mail, Phone, MapPin, Globe, Share2, Link as LinkIcon, MessageCircle } from 'lucide-react'
+import { Mail, Phone, MapPin, Globe, Share2, Link as LinkIcon, MessageCircle } from 'lucide-react'
 import { NAV_LINKS } from '../../config/constants'
+import Logo from '../ui/Logo'
 
 const FOOTER_LINKS = {
   Company: NAV_LINKS.filter((l) => ['/', '/about', '/team', '/blog'].includes(l.path)),
@@ -41,12 +42,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600">
-                <Heart className="h-5 w-5 text-white" fill="white" />
-              </div>
-              <span className="text-xl font-bold text-white">MedMitra</span>
-            </Link>
+            <Logo to="/" size="md" />
             <p className="mt-4 max-w-sm text-sm leading-relaxed">
               India&apos;s trusted digital healthcare platform. Order medicines, manage prescriptions,
               and track your health — all in one place.

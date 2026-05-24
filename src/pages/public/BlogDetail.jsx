@@ -1,11 +1,20 @@
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Calendar, User } from 'lucide-react'
-import { blogPosts } from '../../data/mockData'
+import { useBlogPosts } from '../../hooks/useFirestore'
 import { formatDate } from '../../utils/helpers'
 
 export default function BlogDetail() {
   const { slug } = useParams()
+  const { data: blogPosts, loading } = useBlogPosts()
   const post = blogPosts.find((p) => p.slug === slug)
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-gray-600">Loading article...</p>
+      </div>
+    )
+  }
 
   if (!post) {
     return (

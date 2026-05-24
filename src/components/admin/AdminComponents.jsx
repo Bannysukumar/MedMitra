@@ -1,5 +1,7 @@
+import { Pencil, Trash2 } from 'lucide-react'
 import { cn } from '../../utils/helpers'
 import Card from '../ui/Card'
+import Button from '../ui/Button'
 
 export default function AdminPageHeader({ subtitle, action }) {
   if (!subtitle && !action) return null
@@ -58,10 +60,51 @@ export function AdminTableRow({ children, className }) {
   )
 }
 
-export function AdminTableCell({ children, className, highlight }) {
+export function AdminTableCell({ children, className, highlight, colSpan }) {
   return (
-    <td className={cn('px-5 py-3.5', highlight ? 'font-semibold text-gray-900' : '', className)}>
+    <td colSpan={colSpan} className={cn('px-5 py-3.5', highlight ? 'font-semibold text-gray-900' : '', className)}>
       {children}
     </td>
   )
+}
+
+export function AdminRowActions({ onEdit, onDelete, children }) {
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      {children}
+      {onEdit && (
+        <Button type="button" size="sm" variant="secondary" onClick={onEdit}>
+          <Pencil className="h-3.5 w-3.5" />
+          Edit
+        </Button>
+      )}
+      {onDelete && (
+        <Button type="button" size="sm" variant="danger" onClick={onDelete}>
+          <Trash2 className="h-3.5 w-3.5" />
+          Delete
+        </Button>
+      )}
+    </div>
+  )
+}
+
+export function AdminSelect({ label, className, children, ...props }) {
+  return (
+    <div className="space-y-2">
+      {label && <label className="block text-sm font-semibold text-gray-700">{label}</label>}
+      <select
+        className={cn(
+          'w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </select>
+    </div>
+  )
+}
+
+export function confirmDelete(name) {
+  return window.confirm(`Delete "${name}"? This action cannot be undone.`)
 }

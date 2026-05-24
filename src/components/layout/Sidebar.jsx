@@ -1,11 +1,11 @@
 import { NavLink, Link } from 'react-router-dom'
 import {
-  Heart,
   LayoutDashboard,
   Package,
   Pill,
   FileText,
   HeartPulse,
+  Heart,
   MapPin,
   Bell,
   Settings,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { SIDEBAR_LINKS } from '../../config/constants'
 import { useAuth } from '../../contexts/AuthContext'
+import Logo from '../ui/Logo'
 import { cn } from '../../utils/helpers'
 
 const iconMap = {
@@ -55,12 +56,7 @@ export default function Sidebar({ open, onClose }) {
         )}
       >
         <div className="flex h-[72px] items-center justify-between px-6">
-          <Link to="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600">
-              <Heart className="h-4 w-4 text-white" fill="white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">MedMitra</span>
-          </Link>
+          <Logo to="/dashboard" size="md" onClick={onClose} />
           <button
             type="button"
             onClick={onClose}

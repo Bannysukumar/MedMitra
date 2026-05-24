@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { useAuth } from '../../contexts/AuthContext'
 import { useCartStore } from '../../stores/useStore'
-import { demoAddresses } from '../../data/mockData'
+import { useUserAddresses } from '../../hooks/useFirestore'
+import { createOrder } from '../../services/firestoreService'
 import Card, { CardHeader } from '../../components/ui/Card'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
@@ -11,9 +13,11 @@ import toast from 'react-hot-toast'
 
 export default function Checkout() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const { data: addresses } = useUserAddresses(user?.uid)
   const { items, getSubtotal, getDiscount, getTotal, clearCart, applyCoupon, coupon } = useCartStore()
   const [couponCode, setCouponCode] = useState('')
-  const defaultAddr = demoAddresses.find((a) => a.isDefault) || demoAddresses[0]
+  const defaultAddr = addresses.find((a) => a.isDefault) || addresses[0]
 
   const { register, handleSubmit } = useForm({
     defaultValues: {
@@ -24,8 +28,23 @@ export default function Checkout() {
     },
   })
 
-  const onSubmit = () => {
+  const onSubmit = async (data) => {
+    if (!user) return
     const orderId = generateOrderId()
+    await createOrder(user.uid, {
+      id: orderId,
+      items: items.map((i) => ({
+        medicineId: i.id,
+        name: i.name,
+        quantity: i.quantity,
+        price: i.price,
+        image: i.image,
+      })),
+      total: getTotal(),
+      savings: getDiscount(),
+      address: `${data.address}, ${data.city} ${data.pincode}`,
+      payment: data.payment,
+    })
     clearCart()
     navigate('/dashboard/order-success', { state: { orderId, total: getTotal() } })
     toast.success('Order placed successfully!')
