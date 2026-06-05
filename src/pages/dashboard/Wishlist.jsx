@@ -7,7 +7,7 @@ import { formatCurrency } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 
 export default function Wishlist() {
-  const { items, removeItem } = useWishlistStore()
+  const { items, removeItem, clearWishlist } = useWishlistStore()
   const addToCart = useCartStore((s) => s.addItem)
 
   if (items.length === 0) {
@@ -25,10 +25,24 @@ export default function Wishlist() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Wishlist</h1>
-        <p className="text-gray-600">{items.length} saved items</p>
-      </div>
+      <div className="flex items-center justify-between">
+  <div>
+    <h1 className="text-2xl font-bold text-gray-900">Wishlist</h1>
+    <p className="text-gray-600">{items.length} saved items</p>
+  </div>
+
+  <Button
+  variant="ghost"
+  onClick={() => {
+    if (window.confirm('Are you sure you want to clear the wishlist?')) {
+      clearWishlist()
+      toast.success('Wishlist cleared')
+    }
+  }}
+>
+  Clear Wishlist
+</Button>
+</div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((med) => (
@@ -48,9 +62,16 @@ export default function Wishlist() {
                 <ShoppingCart className="h-4 w-4" />
                 Add to Cart
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => removeItem(med.id)}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <Button
+  size="sm"
+  variant="ghost"
+  onClick={() => {
+    removeItem(med.id)
+    toast.success('Removed from wishlist')
+  }}
+>
+  <Trash2 className="h-4 w-4" />
+</Button>
             </div>
           </Card>
         ))}

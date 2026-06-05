@@ -9,12 +9,12 @@ import {
   ClipboardList,
 } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
-import { useAuth } from '../../contexts/AuthContext'
 import { useUserOrders } from '../../hooks/useFirestore'
 import DashboardCard, { OrderThumbnail } from '../../components/dashboard/DashboardCard'
 import StatusPill from '../../components/ui/StatusPill'
 import Button from '../../components/ui/Button'
 import { formatCurrency, formatDate } from '../../utils/helpers'
+import { useAuth } from '../../contexts/AuthContext'
 
 const CHART_COLORS = {
   delivered: '#22c55e',
@@ -112,6 +112,23 @@ export default function Dashboard() {
       <h2 className="text-xl font-bold text-gray-900">
         Welcome back, {firstName}! 👋
       </h2>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <Link to="/dashboard/medicines">
+    <Button size="full">Browse Medicines</Button>
+  </Link>
+
+  <Link to="/dashboard/orders">
+    <Button size="full">My Orders</Button>
+  </Link>
+
+  <Link to="/dashboard/wishlist">
+    <Button size="full">Wishlist</Button>
+  </Link>
+
+  <Link to="/dashboard/prescriptions">
+    <Button size="full">Upload Prescription</Button>
+  </Link>
+</div>
 
       <div className="grid min-w-0 gap-6 xl:grid-cols-12">
         <DashboardCard className="min-w-0 xl:col-span-3">
