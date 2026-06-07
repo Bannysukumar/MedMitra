@@ -12,8 +12,19 @@ import {
   Menu,
   X,
   Shield,
+  BarChart3,
+  Sparkles,
+  CreditCard,
+  HeartPulse,
+  Headphones,
+  Bell,
+  Mail,
+  Megaphone,
+  ScrollText,
+  Database,
+  Settings,
 } from 'lucide-react'
-import { ADMIN_LINKS } from '../../config/constants'
+import { ADMIN_NAV_SECTIONS } from '../../config/constants'
 import { useAuth } from '../../contexts/AuthContext'
 import Logo from '../ui/Logo'
 import { cn } from '../../utils/helpers'
@@ -25,27 +36,30 @@ const iconMap = {
   FileText,
   Package,
   FileEdit,
+  BarChart3,
+  Sparkles,
+  CreditCard,
+  HeartPulse,
+  Headphones,
+  Bell,
+  Mail,
+  Megaphone,
+  Shield,
+  ScrollText,
+  Database,
+  Settings,
 }
 
-const PAGE_TITLES = {
-  '/admin': 'Admin Dashboard',
-  '/admin/users': 'Users',
-  '/admin/medicines': 'Medicines',
-  '/admin/prescriptions': 'Prescriptions',
-  '/admin/orders': 'Orders',
-  '/admin/content': 'Content',
-}
+const PAGE_TITLES = Object.fromEntries(
+  ADMIN_NAV_SECTIONS.flatMap((s) => s.links.map((l) => [l.path, l.label]))
+)
 
 export default function AdminLayout() {
   const { logout } = useAuth()
   const { pathname } = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const handleLogout = () => {
-    logout()
-  }
-
-  const title = PAGE_TITLES[pathname] || 'Admin'
+  const title = PAGE_TITLES[pathname] || 'Admin Control Panel'
 
   return (
     <div className="admin-layout relative min-h-dvh w-full overflow-x-hidden bg-[#f8fafc]">
@@ -59,7 +73,7 @@ export default function AdminLayout() {
 
       <aside
         className={cn(
-          'fixed left-0 top-0 z-50 flex h-screen w-[260px] flex-col bg-sidebar text-white transition-transform duration-300 lg:translate-x-0',
+          'fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col bg-sidebar text-white transition-transform duration-300 lg:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
@@ -76,32 +90,41 @@ export default function AdminLayout() {
 
         <div className="mx-4 mt-4 flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold text-primary-200">
           <Shield className="h-3.5 w-3.5" />
-          Admin Panel
+          Platform Admin — Full Control
         </div>
 
-        <nav className="flex-1 space-y-0.5 overflow-y-auto px-4 py-4">
-          {ADMIN_LINKS.map((link) => {
-            const Icon = iconMap[link.icon] || LayoutDashboard
-            return (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                end={link.path === '/admin'}
-                onClick={() => setSidebarOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition',
-                    isActive
-                      ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25'
-                      : 'text-gray-400 hover:bg-sidebar-hover hover:text-white'
+        <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
+          {ADMIN_NAV_SECTIONS.map((section) => (
+            <div key={section.title}>
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                {section.title}
+              </p>
+              <div className="space-y-0.5">
+                {section.links.map((link) => {
+                  const Icon = iconMap[link.icon] || LayoutDashboard
+                  return (
+                    <NavLink
+                      key={link.path}
+                      to={link.path}
+                      end={link.path === '/admin'}
+                      onClick={() => setSidebarOpen(false)}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                          isActive
+                            ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25'
+                            : 'text-gray-400 hover:bg-sidebar-hover hover:text-white'
+                        )
+                      }
+                    >
+                      <Icon className="h-[18px] w-[18px] shrink-0" />
+                      {link.label}
+                    </NavLink>
                   )
-                }
-              >
-                <Icon className="h-[18px] w-[18px] shrink-0" />
-                {link.label}
-              </NavLink>
-            )
-          })}
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <div className="space-y-0.5 border-t border-white/10 p-4">
@@ -115,7 +138,7 @@ export default function AdminLayout() {
           </Link>
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={logout}
             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-400 transition hover:bg-sidebar-hover hover:text-white"
           >
             <LogOut className="h-[18px] w-[18px] shrink-0" />
@@ -124,7 +147,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      <div className="flex min-h-dvh w-full min-w-0 flex-col lg:pl-[260px]">
+      <div className="flex min-h-dvh w-full min-w-0 flex-col lg:pl-[280px]">
         <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between border-b border-gray-100 bg-white px-4 sm:px-6">
           <div className="flex items-center gap-3">
             <button
@@ -134,10 +157,13 @@ export default function AdminLayout() {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <h1 className="text-lg font-bold text-gray-900 sm:text-xl">{title}</h1>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900 sm:text-xl">{title}</h1>
+              <p className="hidden text-xs text-gray-500 sm:block">Single admin authority — no super admin tier</p>
+            </div>
           </div>
           <span className="hidden rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 sm:inline-flex">
-            Administration
+            MedMitra Admin
           </span>
         </header>
 

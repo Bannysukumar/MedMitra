@@ -220,6 +220,7 @@ export async function createOrder(userId, orderData) {
     ...orderData,
     userId,
     status: 'pending',
+    paymentStatus: orderData.paymentStatus || 'paid',
     createdAt: new Date().toISOString(),
   })
   await addDoc(collection(db, `users/${userId}/notifications`), {
@@ -232,8 +233,8 @@ export async function createOrder(userId, orderData) {
   return docRef.id
 }
 
-export async function updateOrderStatus(orderId, status) {
-  await updateDoc(doc(db, 'orders', orderId), { status })
+export async function updateOrderStatus(orderId, status, extra = {}) {
+  await updateDoc(doc(db, 'orders', orderId), { status, ...extra, updatedAt: new Date().toISOString() })
 }
 
 export async function updatePrescriptionStatus(rxId, status) {

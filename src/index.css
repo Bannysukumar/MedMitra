@@ -80,8 +80,17 @@
       linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
   }
 
-  .auth-page {
+  .auth-page,
+  .address-form {
     color-scheme: light;
+  }
+
+  .address-form .form-input {
+    min-height: 48px;
+    border-radius: 0.75rem;
+    border-color: #e5e7eb !important;
+    background-color: #ffffff !important;
+    color: #111827 !important;
   }
 
   .form-input,

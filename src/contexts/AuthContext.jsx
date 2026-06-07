@@ -9,7 +9,7 @@ import {
   updateProfile,
   onAuthStateChanged,
 } from 'firebase/auth'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
 import { auth, db, googleProvider, facebookProvider } from '../config/firebase'
 import { clearDemoUserData } from '../services/firestoreService'
 import { useCartStore, useWishlistStore } from '../stores/useStore'
@@ -38,7 +38,24 @@ export function AuthProvider({ children }) {
           console.error('Demo data cleanup failed:', err)
         }
         const data = await loadProfile(firebaseUser)
+        if (data.accountStatus === 'blocked' || data.accountStatus === 'suspended') {
+          await signOut(auth)
+          toast.error(
+            data.accountStatus === 'blocked'
+              ? 'Your account has been blocked. Contact support.'
+              : 'Your account is suspended. Contact support.'
+          )
+          setUser(null)
+          setProfile(null)
+          setLoading(false)
+          return
+        }
         setProfile(data)
+        await setDoc(
+          doc(db, 'users', firebaseUser.uid),
+          { lastActivity: new Date().toISOString(), lastLoginAt: new Date().toISOString() },
+          { merge: true }
+        )
       } else {
         setUser(null)
         setProfile(null)
@@ -47,6 +64,24 @@ export function AuthProvider({ children }) {
     })
     return unsub
   }, [])
+
+  useEffect(() => {
+    if (!user?.uid) return undefined
+    const unsub = onSnapshot(doc(db, 'users', user.uid), (snap) => {
+      if (!snap.exists()) return
+      const data = snap.data()
+      setProfile((prev) => ({ ...prev, ...data }))
+      if (data.accountStatus === 'blocked' || data.accountStatus === 'suspended') {
+        signOut(auth)
+        toast.error('Your account access has been revoked.')
+      }
+      if (data.forceLogoutAt && data.lastLoginAt && data.forceLogoutAt > data.lastLoginAt) {
+        signOut(auth)
+        toast.error('You have been logged out by an administrator.')
+      }
+    })
+    return unsub
+  }, [user?.uid])
 
   const signup = async ({ fullName, email, phone, password }) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password)
@@ -79,6 +114,18 @@ export function AuthProvider({ children }) {
       throw new Error('Admin access only. Set role to "admin" in Firestore users collection.')
     }
     toast.success('Welcome, Admin!')
+    return cred.user
+  }
+
+  const doctorLogin = async ({ email, password }) => {
+    const cred = await signInWithEmailAndPassword(auth, email, password)
+    const profileDoc = await getDoc(doc(db, 'users', cred.user.uid))
+    const role = profileDoc.data()?.role
+    if (role !== 'doctor' && role !== 'admin') {
+      await signOut(auth)
+      throw new Error('Doctor access only. Set role to "doctor" in Firestore users collection.')
+    }
+    toast.success('Welcome, Doctor!')
     return cred.user
   }
 
@@ -127,6 +174,7 @@ export function AuthProvider({ children }) {
   }
 
   const isAdmin = profile?.role === 'admin'
+  const isDoctor = profile?.role === 'doctor' || profile?.role === 'admin'
   const displayName = user?.displayName || profile?.fullName || 'User'
   const plan = profile?.plan || 'free'
 
@@ -139,12 +187,14 @@ export function AuthProvider({ children }) {
         signup,
         login,
         adminLogin,
+        doctorLogin,
         socialLogin,
         logout,
         resetPassword,
         updateUserProfile,
         refreshProfile,
         isAdmin,
+        isDoctor,
         displayName,
         plan,
         isAuthenticated: !!user,

@@ -1,5 +1,12 @@
 import { cn } from '../../utils/helpers'
-import { ORDER_STATUSES, PRESCRIPTION_STATUSES } from '../../config/constants'
+import {
+  ORDER_STATUSES,
+  PRESCRIPTION_STATUSES,
+  PAYMENT_STATUSES,
+  USER_ACCOUNT_STATUSES,
+  TICKET_STATUSES,
+  TICKET_PRIORITIES,
+} from '../../config/constants'
 
 const colors = {
   green: 'bg-green-100 text-green-700',
@@ -10,9 +17,18 @@ const colors = {
   gray: 'bg-gray-100 text-gray-700',
 }
 
+const maps = {
+  order: ORDER_STATUSES,
+  prescription: PRESCRIPTION_STATUSES,
+  payment: PAYMENT_STATUSES,
+  user: USER_ACCOUNT_STATUSES,
+  ticket: TICKET_STATUSES,
+  priority: TICKET_PRIORITIES,
+}
+
 export default function StatusPill({ status, type = 'order', className }) {
-  const map = type === 'prescription' ? PRESCRIPTION_STATUSES : ORDER_STATUSES
-  const config = map[status] || { label: status, color: 'gray' }
+  const map = maps[type] || ORDER_STATUSES
+  const config = map[status] || { label: status?.replace(/_/g, ' ') || '—', color: 'gray' }
 
   return (
     <span

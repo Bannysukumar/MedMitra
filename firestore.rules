@@ -14,6 +14,16 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    function isActiveUser() {
+      let status = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountStatus;
+      return status == null || status == 'active';
+    }
+
+    function isDoctor() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['doctor', 'admin'];
+    }
+
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isSignedIn() && request.auth.uid == userId;
@@ -84,6 +94,65 @@ service cloud.firestore {
     match /supportTickets/{ticketId} {
       allow create: if true;
       allow read, update: if isAdmin();
+    }
+
+    match /auditLogs/{logId} {
+      allow read, create: if isAdmin();
+    }
+
+    match /announcements/{annId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /emailTemplates/{templateId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /securityLogs/{logId} {
+      allow read, create: if isAdmin();
+    }
+
+    match /platformSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn() && isActiveUser();
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /doctors/{doctorId} {
+      allow read: if true;
+      allow write: if isOwner(doctorId) || isAdmin();
+    }
+
+    match /doctorStats/{doctorId} {
+      allow read: if isOwner(doctorId) || isAdmin();
+      allow write: if isOwner(doctorId) || isAdmin();
+    }
+
+    match /doctorAppointments/{apptId} {
+      allow read: if isSignedIn() &&
+        (resource.data.doctorId == request.auth.uid || isAdmin());
+      allow create: if isDoctor() && request.resource.data.doctorId == request.auth.uid;
+      allow update, delete: if isAdmin() ||
+        (isDoctor() && resource.data.doctorId == request.auth.uid);
+    }
+
+    match /medicalFacilities/{facilityId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /doctorPatients/{patientId} {
+      allow read: if isSignedIn() &&
+        (resource.data.doctorId == request.auth.uid || isAdmin());
+      allow create: if isDoctor() && request.resource.data.doctorId == request.auth.uid;
+      allow update, delete: if isAdmin() ||
+        (isDoctor() && resource.data.doctorId == request.auth.uid);
     }
   }
 }

@@ -70,9 +70,16 @@ export default function Addresses() {
         )}
       </div>
 
-      <Modal open={showModal} onClose={() => setShowModal(false)} title="Add New Address">
+      <Modal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title="Add New Address"
+        variant="dark"
+        size="sm"
+      >
         <form
-          className="space-y-4"
+          className="address-form space-y-4"
+          style={{ colorScheme: 'light' }}
           onSubmit={async (e) => {
             e.preventDefault()
             if (!user) return
@@ -91,13 +98,15 @@ export default function Addresses() {
             setShowModal(false)
           }}
         >
-          <Input label="Label" name="label" placeholder="Home, Work..." required />
-          <Input label="Full Name" name="fullName" required />
-          <Input label="Phone" name="phone" required />
-          <Input label="Address" name="address" required />
-          <Input label="City" name="city" required />
-          <Input label="Pincode" name="pincode" required />
-          <Button type="submit" size="full">Save Address</Button>
+          <Input variant="onDark" label="Label" name="label" placeholder="Home, Work..." required />
+          <Input variant="onDark" label="Full Name" name="fullName" placeholder="Enter full name" required />
+          <Input variant="onDark" label="Phone" name="phone" type="tel" placeholder="Enter phone number" required />
+          <Input variant="onDark" label="Address" name="address" placeholder="Street address" required />
+          <Input variant="onDark" label="City" name="city" placeholder="Enter city" required />
+          <Input variant="onDark" label="Pincode" name="pincode" placeholder="Enter pincode" required />
+          <Button type="submit" size="full" className="mt-2">
+            Save Address
+          </Button>
         </form>
       </Modal>
     </div>

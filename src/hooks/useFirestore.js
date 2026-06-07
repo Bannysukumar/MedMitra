@@ -15,6 +15,15 @@ import {
   subscribeUserNotifications,
   getSiteStats,
 } from '../services/firestoreService'
+import {
+  subscribeSupportTickets,
+  subscribeAuditLogs,
+  subscribeAnnouncements,
+  subscribeEmailTemplates,
+  subscribeSecurityLogs,
+  subscribePlatformSettings,
+  subscribeAllSessions,
+} from '../services/adminService'
 
 export function useFirestoreSubscription(subscribeFn, deps = [], { skip = false } = {}) {
   const [data, setData] = useState([])
@@ -47,6 +56,30 @@ export function useFirestoreSubscription(subscribeFn, deps = [], { skip = false 
     return () => unsub?.()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [skip, ...deps])
+
+  return { data, loading, error }
+}
+
+export function useFirestoreDoc(subscribeFn, deps = []) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    setLoading(true)
+    const unsub = subscribeFn(
+      (doc) => {
+        setData(doc)
+        setLoading(false)
+      },
+      (err) => {
+        setError(err)
+        setLoading(false)
+      }
+    )
+    return () => unsub?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps)
 
   return { data, loading, error }
 }
@@ -119,6 +152,34 @@ export function useUserNotifications(userId) {
   )
 }
 
+export function useSupportTickets() {
+  return useFirestoreSubscription((onData, onError) => subscribeSupportTickets(onData, onError), [])
+}
+
+export function useAuditLogs() {
+  return useFirestoreSubscription((onData, onError) => subscribeAuditLogs(onData, onError), [])
+}
+
+export function useAnnouncements() {
+  return useFirestoreSubscription((onData, onError) => subscribeAnnouncements(onData, onError), [])
+}
+
+export function useEmailTemplates() {
+  return useFirestoreSubscription((onData, onError) => subscribeEmailTemplates(onData, onError), [])
+}
+
+export function useSecurityLogs() {
+  return useFirestoreSubscription((onData, onError) => subscribeSecurityLogs(onData, onError), [])
+}
+
+export function usePlatformSettings() {
+  return useFirestoreDoc((onData, onError) => subscribePlatformSettings(onData, onError), [])
+}
+
+export function useAllSessions() {
+  return useFirestoreSubscription((onData, onError) => subscribeAllSessions(onData, onError), [])
+}
+
 export function useSiteStats() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -138,4 +199,31 @@ export function useSiteStats() {
   }, [])
 
   return { stats, loading, error }
+}
+
+export function useAdminData() {
+  const users = useUsers()
+  const orders = useAllOrders()
+  const medicines = useMedicines()
+  const prescriptions = useAllPrescriptions()
+  const tickets = useSupportTickets()
+  const sessions = useAllSessions()
+
+  const loading =
+    users.loading ||
+    orders.loading ||
+    medicines.loading ||
+    prescriptions.loading ||
+    tickets.loading ||
+    sessions.loading
+
+  return {
+    users: users.data,
+    orders: orders.data,
+    medicines: medicines.data,
+    prescriptions: prescriptions.data,
+    tickets: tickets.data,
+    sessions: sessions.data,
+    loading,
+  }
 }

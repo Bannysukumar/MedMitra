@@ -1,0 +1,97 @@
+const admin = require('firebase-admin')
+const path = require('path')
+const fs = require('fs')
+
+const keyPath = path.join(__dirname, '..', '..', 'medmitra-46913-firebase-adminsdk-fbsvc-711f4a8ae5.json')
+const serviceAccount = JSON.parse(fs.readFileSync(keyPath, 'utf8'))
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
+
+const PROFILE = {
+  fullName: 'Dr. Arjun Sharma',
+  specialty: 'Cardiologist',
+  qualifications: 'MBBS, MD (Cardiology)',
+  experienceYears: 12,
+  rating: 4.8,
+  totalPatients: 2548,
+  satisfaction: 98,
+  verified: true,
+  isPublic: true,
+  email: 'dr.arjun@medmitra.com',
+  phone: '+91 98765 43210',
+  specialization: 'Interventional Cardiology',
+  consultationFee: 800,
+  availability: 'Available',
+  availabilityHours: 'Mon - Sat 10:00 AM - 6:00 PM',
+  personal: {
+    fullName: 'Dr. Arjun Sharma',
+    dateOfBirth: '15 March 1985',
+    gender: 'Male',
+    nationality: 'Indian',
+    languages: 'English, Hindi, Telugu',
+    registrationNumber: 'MCI-123456',
+    phone: '+91 98765 43210',
+    email: 'dr.arjun@medmitra.com',
+    address: '123 Medical Lane, Hyderabad, Telangana - 500001',
+    consultationFee: '₹800',
+    opdTimings: 'Mon - Sat, 10:00 AM - 6:00 PM',
+    emergencyContact: '+91 91234 56789',
+  },
+  aboutMe:
+    'Dr. Arjun Sharma is a highly experienced cardiologist with over 12 years of practice in interventional cardiology. He specializes in diagnosing and treating heart conditions, performing angioplasties, and managing chronic cardiac diseases. Known for his patient-centric approach, Dr. Sharma is dedicated to providing compassionate and evidence-based cardiac care.',
+  education: [
+    { degree: 'MBBS', institution: 'Osmania Medical College', year: '2008' },
+    { degree: 'MD (Cardiology)', institution: 'AIIMS New Delhi', year: '2012' },
+    { degree: 'Fellowship in Interventional Cardiology', institution: 'Cleveland Clinic, USA', year: '2014' },
+  ],
+  experience: [
+    { role: 'Senior Cardiologist', hospital: 'City Heart Care Hospital', years: '2018 - Present' },
+    { role: 'Consultant Cardiologist', hospital: 'Apollo Hospitals', years: '2014 - 2018' },
+    { role: 'Resident Doctor', hospital: 'AIIMS New Delhi', years: '2012 - 2014' },
+  ],
+  certificates: [
+    { name: 'Medical Council of India Registration', issuer: 'MCI', year: '2008' },
+    { name: 'Board Certification in Cardiology', issuer: 'National Board', year: '2012' },
+    { name: 'Advanced Cardiac Life Support (ACLS)', issuer: 'American Heart Association', year: '2015' },
+  ],
+  hospital: {
+    name: 'City Heart Care Hospital',
+    department: 'Cardiology',
+    designation: 'Senior Consultant Cardiologist',
+    address: '45 Health Avenue, Banjara Hills, Hyderabad - 500034',
+    phone: '+91 40 2345 6789',
+    website: 'www.cityheartcare.com',
+  },
+  bank: {
+    accountName: 'Dr. Arjun Sharma',
+    bankName: 'HDFC Bank',
+    accountNumber: '**** **** 4521',
+    ifsc: 'HDFC0001234',
+    pan: 'ABCDE****F',
+  },
+  documents: [
+    { name: 'Registration Certificate', type: 'pdf' },
+    { name: 'Medical Degree (MBBS)', type: 'pdf' },
+    { name: 'MD Cardiology Certificate', type: 'pdf' },
+    { name: 'Experience Letter', type: 'pdf' },
+  ],
+  profileCompletion: 100,
+  profileSections: {
+    personal: true,
+    education: true,
+    experience: true,
+    certificates: true,
+    hospital: true,
+    bank: true,
+  },
+  updatedAt: new Date().toISOString(),
+}
+
+async function main() {
+  const email = 'doctor@medmitra.com'
+  const user = await admin.auth().getUserByEmail(email)
+  await admin.firestore().doc(`doctors/${user.uid}`).set(PROFILE, { merge: true })
+  console.log('Doctor profile seeded for', user.uid)
+  console.log('Public URL: https://medmitra-46913.web.app/doctors/' + user.uid)
+}
+
+main().catch(console.error)

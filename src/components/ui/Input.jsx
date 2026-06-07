@@ -13,12 +13,22 @@ export default function Input({
   rightElement,
   className,
   containerClassName,
+  variant = 'default',
   ...props
 }) {
+  const onDark = variant === 'onDark'
+
   return (
     <div className={cn('space-y-2', containerClassName)}>
       {label && (
-        <label className="block text-sm font-semibold text-gray-700">{label}</label>
+        <label
+          className={cn(
+            'block text-sm font-medium',
+            onDark ? 'text-gray-400' : 'font-semibold text-gray-700'
+          )}
+        >
+          {label}
+        </label>
       )}
       <div className="relative">
         {Icon && (
@@ -28,6 +38,7 @@ export default function Input({
           className={cn(
             'w-full rounded-xl border px-4 text-[15px] leading-normal transition focus:outline-none focus:ring-2',
             inputStyles,
+            onDark && 'border-gray-200 bg-white text-gray-900 shadow-none',
             Icon && 'pl-11',
             rightElement && 'pr-11',
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
