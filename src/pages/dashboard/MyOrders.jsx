@@ -58,6 +58,8 @@ export default function MyOrders() {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-gray-900">{item.name}</p>
+                  
+                  
                   <p className="text-sm text-gray-500">
                     {order.id} · {formatDate(order.createdAt)}
                   </p>
