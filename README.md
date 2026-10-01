@@ -2,78 +2,96 @@
 
 A modern healthcare web application for ordering medicines, managing prescriptions, and tracking health records.
 
+[![License](https://img.shields.io/github/license/Bannysukumar/MedMitra)](https://github.com/Bannysukumar/MedMitra/blob/main/LICENSE) [![Stars](https://img.shields.io/github/stars/Bannysukumar/MedMitra)](https://github.com/Bannysukumar/MedMitra/stargazers) [![Last commit](https://img.shields.io/github/last-commit/Bannysukumar/MedMitra)](https://github.com/Bannysukumar/MedMitra/commits/main)
+
+## Overview
+
+A modern healthcare web application for ordering medicines, managing prescriptions, and tracking health records.
+
+
+What is actually in the repository: `functions/`, `public/`, `scripts/`, `src/`. GitHub reports the primary language as JavaScript.
+
+Published site recorded on the repository: https://med-mitra-chi.vercel.app
+
 ## Features
 
-- **Public site**: Home, About, Features, Medicine catalog, Pricing, Team, Blog, FAQ, Contact
-- **User dashboard**: Orders, medicines, prescriptions, health records, wishlist, cart & checkout
-- **Admin panel**: Users, medicines, prescriptions, orders, content management
-- **Demo mode**: Works without Firebase — uses localStorage and mock data
+
+- Public site: Home, About, Features, Medicine catalog, Pricing, Team, Blog, FAQ, Contact
+- User dashboard: Orders, medicines, prescriptions, health records, wishlist, cart & checkout
+- Admin panel: Users, medicines, prescriptions, orders, content management
+- Demo mode: Works without Firebase — uses localStorage and mock data
 
 ## Tech Stack
 
-- React 19 + Vite 8
-- Tailwind CSS v4
-- React Router v7
-- Zustand (cart, wishlist, theme)
-- Firebase (Auth, Firestore, Storage) — optional
-- Recharts, react-hook-form, react-hot-toast, lucide-react
+| Technology | Where it shows up |
+|---|---|
+| React | User interface |
+| Vite | Frontend build tool |
+| Firebase | Backend services used by this repository |
+| Tailwind CSS | Styling |
+| Recharts | Charts |
+
+## Project Architecture
+
+React interface built with Vite → Firebase project files (firestore rules, hosting, or functions) checked into this repository.
+
+## Project Structure
+
+```text
+MedMitra/
+├── functions/
+├── public/
+├── scripts/
+├── src/
+├── .env.example
+├── .firebaserc
+├── eslint.config.js
+├── firebase.json
+├── firestore.indexes.json
+├── firestore.rules
+├── index.html
+├── package-lock.json
+├── package.json
+├── storage.rules
+├── vite.config.js
+```
 
 ## Getting Started
 
 ```bash
-cd medmitra
+git clone https://github.com/Bannysukumar/MedMitra.git
+cd MedMitra
 npm install
 npm run dev
+# Copy .env.example to .env and fill in the values that file lists.
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Scripts defined in package.json:
 
-### Demo Login
+- `npm run dev` — `vite`
+- `npm run build` — `vite build`
+- `npm run lint` — `eslint .`
+- `npm run seed` — `node functions/seed.js`
+- `npm run deploy:rules` — `node functions/deployRules.js`
+- `npm run deploy` — `npm run build && npm run firebase -- deploy --only firestore:rules,hosting --project medmitra-46913`
 
-Use any email/password on the login page — demo mode stores session in `localStorage`.
+## Deployment
 
-### Admin Login
+- firebase.json is in the repository root.
+- The repository homepage is https://med-mitra-chi.vercel.app.
 
-Visit `/admin/login` — sets `medmitra-admin` in localStorage for admin access.
+## Contributing
 
-## Firebase Setup (Optional)
-
-1. Copy `.env.example` to `.env` and fill in Firebase config values
-2. Deploy rules: `firebase deploy --only firestore:rules,storage`
-3. Deploy functions: `cd functions && npm install && cd .. && firebase deploy --only functions`
-
-## Build
-
-```bash
-npm run build
-npm run preview
-```
-
-## Project Structure
-
-```
-src/
-├── components/   # UI components and layouts
-├── config/       # Constants and Firebase
-├── contexts/     # Auth context
-├── data/         # Mock data
-├── pages/        # Route pages (public, auth, dashboard, admin)
-├── routes/       # Protected and admin route guards
-├── services/     # Search service
-├── stores/       # Zustand stores
-└── utils/        # Helpers
-```
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
 ## License
 
-MIT
+Licensed under MIT. See [LICENSE](LICENSE).
 
-<!-- readme-seo: bannysukumar -->
+## Author
 
-## Open source
+[Banny Sukumar](https://github.com/Bannysukumar)
 
-This repository is open source and maintained by [Banny Sukumar](https://github.com/Bannysukumar). MedMitra is published so other developers can study the code and contribute.
-
-## License
-
-Released under the [MIT License](LICENSE). Copyright (c) 2026 Banny Sukumar. See [CONTRIBUTING.md](CONTRIBUTING.md) if you want to help.
+- GitHub: [@Bannysukumar](https://github.com/Bannysukumar)
+- Portfolio: [adepu-sukumar.vercel.app](https://adepu-sukumar.vercel.app/)
+- LinkedIn: [Adepu Sukumar](https://www.linkedin.com/in/adepu-sukumar-59b423351)
