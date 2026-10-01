@@ -1,84 +1,78 @@
+<!-- readme-seo: bannysukumar-professional-v4 -->
+
 # MedMitra
 
-A modern healthcare web application for ordering medicines, managing prescriptions, and tracking health records.
-
-[![License](https://img.shields.io/github/license/Bannysukumar/MedMitra)](https://github.com/Bannysukumar/MedMitra/blob/main/LICENSE) [![Stars](https://img.shields.io/github/stars/Bannysukumar/MedMitra)](https://github.com/Bannysukumar/MedMitra/stargazers) [![Last commit](https://img.shields.io/github/last-commit/Bannysukumar/MedMitra)](https://github.com/Bannysukumar/MedMitra/commits/main)
+MedMitra is a healthcare web application. The HTML meta description says it is a platform for medicines, prescriptions, and health records. The client is built with Vite, and Firebase project files are in the repository.
 
 ## Overview
 
-A modern healthcare web application for ordering medicines, managing prescriptions, and tracking health records.
-
-
-What is actually in the repository: `functions/`, `public/`, `scripts/`, `src/`. GitHub reports the primary language as JavaScript.
-
-Published site recorded on the repository: https://med-mitra-chi.vercel.app
+`index.html` sets the description quoted above. `package.json` provides `dev`, `build`, and Firebase-related scripts. Rules for Firestore and Storage are `firestore.rules` and `storage.rules`. `.env.example` lists environment settings without putting secret values in this README. The recorded homepage is https://med-mitra-chi.vercel.app.
 
 ## Features
 
-
-- Public site: Home, About, Features, Medicine catalog, Pricing, Team, Blog, FAQ, Contact
-- User dashboard: Orders, medicines, prescriptions, health records, wishlist, cart & checkout
-- Admin panel: Users, medicines, prescriptions, orders, content management
-- Demo mode: Works without Firebase — uses localStorage and mock data
+- Public site shell in `index.html` with the MedMitra description
+- Firebase Hosting, Firestore, Storage, and Functions config in `firebase.json`
+- Firestore and Storage security rules
+- Source under `src/` and scripts under `functions/`
 
 ## Tech Stack
 
 | Technology | Where it shows up |
 |---|---|
-| React | User interface |
-| Vite | Frontend build tool |
-| Firebase | Backend services used by this repository |
-| Tailwind CSS | Styling |
-| Recharts | Charts |
+| React 19 | `package.json` and `src/` |
+| Vite | `vite.config.js` and the `dev` script |
+| Firebase | `firebase.json`, `.firebaserc`, rules files |
+| Leaflet | `leaflet` dependency |
+| Tailwind CSS | `@tailwindcss/vite` |
 
-## Project Architecture
+## Architecture
 
-React interface built with Vite → Firebase project files (firestore rules, hosting, or functions) checked into this repository.
+Vite client in `src/` → Firebase services configured by `firebase.json`.
 
 ## Project Structure
 
 ```text
 MedMitra/
+├── src/
 ├── functions/
 ├── public/
-├── scripts/
-├── src/
-├── .env.example
-├── .firebaserc
-├── eslint.config.js
-├── firebase.json
-├── firestore.indexes.json
-├── firestore.rules
 ├── index.html
-├── package-lock.json
 ├── package.json
-├── storage.rules
 ├── vite.config.js
+├── firebase.json
+├── firestore.rules
+└── storage.rules
 ```
 
-## Getting Started
+## Prerequisites
+
+- Node.js
+- npm
+
+## Installation
 
 ```bash
 git clone https://github.com/Bannysukumar/MedMitra.git
 cd MedMitra
 npm install
 npm run dev
-# Copy .env.example to .env and fill in the values that file lists.
 ```
 
-Scripts defined in package.json:
+## Configuration
 
-- `npm run dev` — `vite`
-- `npm run build` — `vite build`
-- `npm run lint` — `eslint .`
-- `npm run seed` — `node functions/seed.js`
-- `npm run deploy:rules` — `node functions/deployRules.js`
-- `npm run deploy` — `npm run build && npm run firebase -- deploy --only firestore:rules,hosting --project medmitra-46913`
+Copy `.env.example` to `.env` and fill values locally. Do not commit real API keys. Firebase project selection is in `.firebaserc`.
+
+## Usage
+
+`npm run dev` starts the Vite app. The meta description defines the product as medicines, prescriptions, and health records.
+
+## Demo
+
+https://med-mitra-chi.vercel.app
 
 ## Deployment
 
-- firebase.json is in the repository root.
-- The repository homepage is https://med-mitra-chi.vercel.app.
+`firebase.json` defines Hosting, Firestore, Storage, and Functions. `vercel.json` is not required for that Firebase config. Homepage: https://med-mitra-chi.vercel.app.
 
 ## Contributing
 
@@ -90,8 +84,6 @@ Licensed under MIT. See [LICENSE](LICENSE).
 
 ## Author
 
-[Banny Sukumar](https://github.com/Bannysukumar)
+Banny Sukumar
 
-- GitHub: [@Bannysukumar](https://github.com/Bannysukumar)
-- Portfolio: [adepu-sukumar.vercel.app](https://adepu-sukumar.vercel.app/)
-- LinkedIn: [Adepu Sukumar](https://www.linkedin.com/in/adepu-sukumar-59b423351)
+GitHub: https://github.com/Bannysukumar
